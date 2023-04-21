@@ -38,7 +38,7 @@ public class DownloadController {
         }
     }
     @GetMapping("/{fileId}")
-    public ResponseEntity<Resource> downloadFile(@PathVariable ObjectId fileId) {
+    public ResponseEntity<Resource> downloadFile(@PathVariable String fileId) {
         InputStream download = downloadService.download(fileId);
         Resource resource = new InputStreamResource(download);
         return ResponseEntity.ok()

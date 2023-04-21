@@ -9,7 +9,7 @@ import java.io.InputStream;
 
 public interface DownloadService {
    // public String upload(InputStream inputStream, String fileName, String contentType);
-    public InputStream download(ObjectId objectId);
+    public InputStream download(String fileId);
     public String upload(MultipartFile multipartFile) throws IOException;
 
 }
