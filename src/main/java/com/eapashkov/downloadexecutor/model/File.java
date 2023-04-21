@@ -24,6 +24,6 @@ public class File {
     private int chunkSize;
     private Date uploadDate;
     private String md5;
-    private Object metadata;
+    private byte [] metadata;
 
 }

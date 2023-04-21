@@ -1,5 +1,6 @@
 package com.eapashkov.downloadexecutor.service;
 
+import com.eapashkov.downloadexecutor.model.File;
 import com.mongodb.client.gridfs.GridFSFindIterable;
 import org.bson.types.ObjectId;
 import org.springframework.web.multipart.MultipartFile;
@@ -8,8 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public interface DownloadService {
-   // public String upload(InputStream inputStream, String fileName, String contentType);
-    public InputStream download(String fileId);
-    public String upload(MultipartFile multipartFile) throws IOException;
+    String upload(MultipartFile multipartFile) throws IOException;
+    File download(String fileId) throws IOException;
 
 }
