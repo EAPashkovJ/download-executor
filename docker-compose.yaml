@@ -6,10 +6,7 @@ services:
     container_name: mongodb
     restart: always
     environment:
-      MONGO_INITDB_DATABASE: download-exchanger
-#      MONGO_INITDB_ROOT_USERNAME: admin
-#      MONGO_INITDB_ROOT_PASSWORD: admin
-#    command: mongod --auth --bind_ip_all --port 27017 --setParameter authenticationMechanisms=SCRAM-SHA-1
+      MONGO_INITDB_DATABASE: upload
     volumes:
       - mongodata:/data/db
     ports:

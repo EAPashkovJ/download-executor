@@ -1,20 +1,22 @@
 package com.eapashkov.downloadexecutor.controller;
 
-import com.eapashkov.downloadexecutor.model.File;
+import com.eapashkov.downloadexecutor.model.FileExchanger;
 import com.eapashkov.downloadexecutor.service.DownloadService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.io.InputStream;
-
 
 
 @RestController
@@ -26,24 +28,20 @@ public class DownloadController {
     private final DownloadService downloadService;
 
     @PostMapping("/upload")
-    public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
-        try {
-            String fileId = downloadService.upload(file);
-            return ResponseEntity.ok(fileId);
-        } catch (IOException e) {
-            throw new RuntimeException("Error uploading file", e);
-        }
+    public ResponseEntity<?> upload(@RequestParam("file") MultipartFile file) throws IOException {
+        return new ResponseEntity<>(downloadService.upload(file), HttpStatus.CREATED);
     }
-    @GetMapping("/{fileId}")
-    public ResponseEntity<Resource> downloadFile(@PathVariable String fileId) throws IOException {
-        File download = downloadService.download(fileId);
+
+
+    @GetMapping("/download/{id}")
+    public ResponseEntity<ByteArrayResource> download(@PathVariable String id) throws IOException {
+
+        FileExchanger fileExchanger = downloadService.download(id);
+
         return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(download.getContentType()))
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + download.getFilename())
-                .body(new ByteArrayResource(download.getMetadata()));
-
-
-
+                .contentType(MediaType.parseMediaType(fileExchanger.getFileType()))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileExchanger.getFilename() + "\"")
+                .body(new ByteArrayResource(fileExchanger.getMetadata()));
     }
 
 }
