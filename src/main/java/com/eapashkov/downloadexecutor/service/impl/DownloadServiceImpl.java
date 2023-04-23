@@ -6,6 +6,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.bson.types.ObjectId;
@@ -19,6 +20,9 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -31,24 +35,27 @@ public class DownloadServiceImpl implements DownloadService {
     private final GridFsOperations gridFsOperations;
 
     @Override
-    public String upload(MultipartFile multipartFile) throws IOException {
+    public List<String> upload(MultipartFile[] files) throws IOException {
 
+        List<String> fileIds = new ArrayList<>();
+        for (MultipartFile file : files) {
+            DBObject metadata = new BasicDBObject();
+            metadata.put("filesize", file.getSize());
+            Object fileId = gridFsTemplate.store(
+                    file.getInputStream(),
+                    file.getOriginalFilename(),
+                    file.getContentType(),
+                    metadata);
+            fileIds.add(fileId.toString());
 
-        DBObject metadata = new BasicDBObject();
-        metadata.put("filesize", multipartFile.getSize());
-        Object fileId = gridFsTemplate.store(
-                multipartFile.getInputStream(),
-                multipartFile.getOriginalFilename(),
-                multipartFile.getContentType(),
-                metadata);
-
-
-        log.info("{} has been uploaded!", StringUtils.capitalize(multipartFile.getOriginalFilename()));
-        return fileId.toString();
+            log.info("{} has been uploaded!", StringUtils.capitalize(Objects.requireNonNull(file.getOriginalFilename())));
+        }
+        return fileIds;
     }
 
 
     @Override
+    @SneakyThrows
     public FileExchanger download(String fileId) throws IOException {
 
         String cleanId = fileId.replace("\n", "");
@@ -61,7 +68,7 @@ public class DownloadServiceImpl implements DownloadService {
             fileExchanger.setFileSize(gridFSFile.getMetadata().get("filesize").toString());
             fileExchanger.setMetadata(IOUtils.toByteArray(gridFsOperations.getResource(gridFSFile).getInputStream()));
 
-            log.info("{} hax been downloaded!", StringUtils.capitalize(gridFSFile.getFilename()));
+            log.info("{} has been downloaded!", StringUtils.capitalize(gridFSFile.getFilename()));
         }
         return fileExchanger;
     }

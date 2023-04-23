@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 
 @RestController
@@ -28,8 +29,8 @@ public class DownloadController {
     private final DownloadService downloadService;
 
     @PostMapping("/upload")
-    public ResponseEntity<?> upload(@RequestParam("file") MultipartFile file) throws IOException {
-        return new ResponseEntity<>(downloadService.upload(file), HttpStatus.CREATED);
+    public ResponseEntity<List<String>> uploadFiles(@RequestParam("files") MultipartFile[] files) throws IOException {
+        return new ResponseEntity<>(downloadService.upload(files), HttpStatus.CREATED);
     }
 
 
