@@ -32,14 +32,14 @@ class DownloadServiceImpl(private val gridFsTemplate: GridFsTemplate, private va
             for (file in files) {
                 val metadata = BasicDBObject()
                 metadata["filesize"] = file?.size
-                val fileId = gridFsTemplate?.store(
+                val fileId = gridFsTemplate.store(
                     file?.inputStream!!,
                     file.originalFilename,
                     file.contentType,
                     metadata
                 )
                 fileIds.add(fileId.toString())
-                logger.info("{} has been uploaded!", StringUtils.capitalize(file?.originalFilename!!))
+                logger.info("{} has been uploaded!", StringUtils.capitalize(file.originalFilename!!))
             }
         }
         return fileIds
@@ -47,14 +47,13 @@ class DownloadServiceImpl(private val gridFsTemplate: GridFsTemplate, private va
 
     @SneakyThrows
     override fun download(fileId: String?): FileExchanger? {
-        val cleanId = fileId?.replace("\n", "")
-        val gridFSFile = gridFsTemplate!!.findOne(Query(Criteria.where("_id").`is`(ObjectId(cleanId))))
+        val gridFSFile = gridFsTemplate.findOne(Query(Criteria.where("_id").`is`(ObjectId(fileId))))
         val fileExchanger = FileExchanger()
         if (gridFSFile.metadata != null) {
             fileExchanger.filename = gridFSFile.filename
             fileExchanger.fileType = gridFSFile.metadata?.get("_contentType").toString()
             fileExchanger.fileSize = gridFSFile.metadata?.get("filesize").toString()
-            fileExchanger.metadata = IOUtils.toByteArray(gridFsOperations!!.getResource(gridFSFile).inputStream)
+            fileExchanger.metadata = IOUtils.toByteArray(gridFsOperations.getResource(gridFSFile).inputStream)
             logger.info("{} has been downloaded!", StringUtils.capitalize(gridFSFile.filename))
         }
         return fileExchanger
