@@ -2,11 +2,14 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '2.7.11'
     id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+    id 'org.jetbrains.kotlin.jvm' version '1.8.20'
+    id "org.jetbrains.kotlin.plugin.spring" version "1.8.20"
 }
-
 group = 'com.eapashkov'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
+
+
 
 configurations {
     compileOnly {
@@ -27,11 +30,23 @@ dependencies {
     implementation 'org.mongodb:mongodb-driver-core'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok:1.18.10'
+    implementation "io.github.microutils:kotlin-logging:2.0.3"
     runtimeOnly 'org.postgresql:postgresql'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
+    implementation("org.jetbrains.kotlin.plugin.spring:org.jetbrains.kotlin.plugin.spring.gradle.plugin:1.8.20")
+    runtimeOnly group: 'org.jetbrains.kotlin', name: 'kotlin-reflect', version: '1.8.20'
+
+
 }
 
 
 tasks.named('test') {
     useJUnitPlatform()
 }
+kotlin {
+    jvmToolchain{
+        version="11"
+    }
+}
+
